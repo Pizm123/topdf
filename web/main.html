@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>pdf生成</title>
+    <link href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <script type="text/javascript" src="/eel.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="card mt-4">
+            <div class="card-body">
+                <h4 align="center">pdf转换工具</h4>
+                <input type="text" class="form-control" id="url" placeholder="请输入html链接地址">
+                <br>
+                <input type="text" class="form-control" id="name" placeholder="请输入生成的pdf文件名">
+                <br>
+                <input type="text" class="form-control" id="outPath" placeholder="请输入pdf文件生成目录">
+                <br>
+                <input type="text" class="form-control" id="filePath" placeholder="请输入Excel文件路径">
+                <p align="center" id="ing"></p>
+                <p align="center" id="out"></p>
+                <div align="center">
+                    <button class="btn btn-lg btn-success" onclick="doThis()">生成pdf</button>
+                <button class="btn btn-lg btn-success" onclick="batchBuild()">批量生成</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <script>
+        // 调用python中的函数,注意需要在定义前加上async声明异步
+        async function doThis(){
+            $("#ing").text('');
+            $("#out").text('');
+            var url=$("#url").val();
+            var name=$("#name").val();
+            var outPath=$("#outPath").val();
+            $("#ing").text("生成中...");
+            let content = await eel.py_fun(url,name,outPath)();  //这里用let不用var,调用的python函数后面是两对括号
+            $("#out").text(content);
+        }
+
+        async function batchBuild(){
+            $("#ing").text('');
+            $("#out").text('');
+            var outPath=$("#outPath").val();
+            var filePath=$("#filePath").val();
+            $("#ing").text("生成中...");
+            let content = await eel.batch(filePath,outPath)();
+            $("#out").text(content);
+        }
+
+        // 将js中的函数暴露给python,这个貌似不怎么需要用
+        eel.expose(js_fun);
+        function js_fun(a){
+            return('这是调用js中函数返回的结果：' + a);
+        }
+    </script>
+</body>
+</html>
